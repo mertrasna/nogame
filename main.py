@@ -13,10 +13,10 @@ def main():
     pygame.display.set_caption("Nogame")
     clock = pygame.time.Clock()
 
-    arthur_stats = {"hp": 100, "speed": 7}
-    merlin_stats = {"hp": 80, "speed": 9}
+    arthur_stats = {"hp": 100, "speed": 9}
+    gawain_stats = {"hp": 150, "speed": 7}
     p1 = Fighter(1, 200, FLOOR_Y, "arthurPendragon_", arthur_stats)
-    p2 = Fighter(2, 1000, FLOOR_Y, "merlin_", merlin_stats)
+    p2 = Fighter(2, 1000, FLOOR_Y, "gawain_", gawain_stats)
 
     # -- THE GAME LOOP --
     running = True
