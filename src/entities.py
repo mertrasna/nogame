@@ -21,7 +21,7 @@ class Fighter(pygame.sprite.Sprite): # inherit powers of pygame.sprite.Sprite
         self.flip = False if player_num == 1 else True
 
         # Physics & Stats
-        self.rect = self.image.get_rect()
+        self.rect = self.image.get_rect() # creates a super object
         self.rect.center = (x,y) 
         self.vel_y = 0 # Vertical velocity 
         self.speed = stats["speed"]
@@ -83,6 +83,12 @@ class Fighter(pygame.sprite.Sprite): # inherit powers of pygame.sprite.Sprite
 
         # Final physical movement
         self.rect.x += dx    
+
+        # Arena boundaries
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.right > 1280: 
+            self.rect.right = 1280    
 
     def draw(self, screen):
         # Put it on the screen
