@@ -28,6 +28,10 @@ class Fighter(pygame.sprite.Sprite): # inherit powers of pygame.sprite.Sprite
         self.hp = stats["hp"]
         self.on_ground = False
 
+        # Animation Variables
+        self.action = 0 # 0: Idle, 1: Run, 2: Jump (based on README rows)
+        self.update_time = pygame.time.get_ticks() 
+
     # METHODS
     def apply_physics(self): # reaching 'backpack' with the self argument
         self.vel_y = GRAVITY
@@ -60,14 +64,28 @@ class Fighter(pygame.sprite.Sprite): # inherit powers of pygame.sprite.Sprite
         self.rect.x += dx
 
     def draw(self, screen):
-        # Handling direction, if self.flip is true, it mirrors the image horizontally
-        img_to_draw = pygame.transform.flip(self.image, self.flip, False)
-
         # Put it on the screen
-        screen.blit(img_to_draw, self.rect)
-            
+        screen.blit(self.image, self.rect)
+
+    def animate(self):
+        animation_cooldown = 100 # How fast to animate (lower is faster)
+
+        # Each row in my sheet has 8 frames (4 for right 4 for left)
+        # Based on README: Row * 8 gives the start of that row, if we are facing right, we use frames 0-3. If left, 4-7.
+        current_row_start = self.action * 8
+        side_offset = 4 if self.flip else 0    
+
+        # Calculate the exact frame index in the big list, we use % 4 to make sure it loops.
+        actual_index = current_row_start + side_offset + (int(self.frame_index) % 4)
+        self.image = self.all_frames[actual_index]
+
+        # Check if enough time has passed to change frames
+        if pygame.time.get_ticks() - self.update_time > animation_cooldown:
+            self.update_time = pygame.time.get_ticks()
+            self.frame_index += 1
 
     def update(self):
         # Every single frame (1/60th of a second), do these:
         self.move() 
         self.apply_physics()  
+        self.animate()
