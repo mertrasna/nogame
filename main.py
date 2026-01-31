@@ -3,6 +3,7 @@ import pygame
 import sys 
 from src.settings import * # module import(global) for speed, from src import settigns later
 from src.entities import Fighter
+import random
 
 def main():
 
@@ -20,8 +21,9 @@ def main():
     # -- THE GAME LOOP --
     running = True
     # Background configs
-    bg_image = pygame.image.load("assets/backgrounds/game_background_1.png").convert() 
-    bg_image = pygame.transform.scale(bg_image,(SCREEN_WIDTH, SCREEN_HEIGHT))
+    bg_image_path = "assets/backgrounds/game_background_"
+    bg_images = (pygame.image.load(f"{bg_image_path}1.png").convert(), pygame.image.load(f"{bg_image_path}2.png").convert(), pygame.image.load(f"{bg_image_path}3.png").convert(), pygame.image.load(f"{bg_image_path}4.png").convert()) 
+    bg_image = pygame.transform.scale(bg_images[random.randint(0,3)],(SCREEN_WIDTH, SCREEN_HEIGHT))
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
