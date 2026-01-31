@@ -13,7 +13,9 @@ def main():
     clock = pygame.time.Clock()
 
     arthur_stats = {"hp": 100, "speed": 7}
-    p1 = Fighter(1,200, FLOOR_Y, "arthurPendragon_", arthur_stats)
+    merlin_stats = {"hp": 80, "speed": 9}
+    p1 = Fighter(1, 200, FLOOR_Y, "arthurPendragon_", arthur_stats)
+    p2 = Fighter(2, 1000, FLOOR_Y, "merlin_", merlin_stats)
 
     # -- THE GAME LOOP --
     running = True
@@ -25,12 +27,13 @@ def main():
         # --- THE HEARTBEAT ---
         # This runs move() and apply_physics() 60 times a second
         p1.update()
-
+        p2.update()
         # --- THE CANVAS ---
         screen.fill(BLACK) # Clear the old frame
         
         # Draw the character at their new position
         p1.draw(screen)
+        p2.draw(screen)
 
         pygame.display.flip()
         clock.tick(FPS)

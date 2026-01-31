@@ -34,7 +34,7 @@ class Fighter(pygame.sprite.Sprite): # inherit powers of pygame.sprite.Sprite
 
     # METHODS
     def apply_physics(self): # reaching 'backpack' with the self argument
-        self.vel_y = GRAVITY
+        self.vel_y += GRAVITY
         self.rect.y += self.vel_y
 
         if self.rect.bottom > FLOOR_Y:
@@ -45,27 +45,55 @@ class Fighter(pygame.sprite.Sprite): # inherit powers of pygame.sprite.Sprite
     def move(self):
         # dx stands for 'delta x'
         dx = 0
-
         keys = pygame.key.get_pressed() # getting a list of keys currently pressed 
+
+        new_action = 0 # Start by IDLE
 
         if self.player_num == 1:
             # Player 1 uses WASD
             if keys[pygame.K_a]: # Move left
                 dx = -self.speed
                 self.flip = True
-            if keys[pygame.K_d]: # Move right
+                self.action = 1
+            elif keys[pygame.K_d]: # Move right
                 dx = self.speed
-                self.flip = False 
-
+                self.flip = False
+                self.action = 1 
             if keys[pygame.K_w] and self.on_ground:
                 self.vel_y = -18 # initial upward burst, to go up you must subtract from Y
-                self.on_ground = False           
+                self.on_ground = False
 
-        self.rect.x += dx
+        elif self.player_num == 2:
+            if keys[pygame.K_LEFT]:
+                dx = -self.speed
+                self.flip = True
+                self.action = 1              
+            elif keys[pygame.K_RIGHT]:
+                dx = self.speed
+                self.flip = False
+                self.action = 1
+            if keys[pygame.K_UP] and self.on_ground:
+                self.vel_y = -18
+                self.on_ground = False            
+
+        if not self.on_ground:
+            new_action = 2 # aka jumping
+
+        self.update_action(new_action)
+
+        # Final physical movement
+        self.rect.x += dx    
 
     def draw(self, screen):
         # Put it on the screen
         screen.blit(self.image, self.rect)
+
+    def update_action(self, new_action):
+        # Only reset the animation if the action actually changed
+        if new_action != self.action:
+            self.action = new_action
+            self.frame_index = 0
+            self.update_time = pygame.time.get_ticks()     
 
     def animate(self):
         animation_cooldown = 100 # How fast to animate (lower is faster)
