@@ -22,7 +22,7 @@ def load_spritesheet(filename, frame_width, frame_height, scale):
             image.blit(sheet, (0,0), (c * frame_width, r * frame_height, frame_width, frame_height))
 
             # Scale it up so that it's visible on HD screen
-            image = pygame.transform.scale(image, (frame_width * scale), frame_height  * scale)
+            image = pygame.transform.scale(image, (frame_width * scale, frame_height  * scale))
 
             sprites.append(image)
 

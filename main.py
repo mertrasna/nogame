@@ -2,44 +2,41 @@
 import pygame
 import sys 
 from src.settings import * # module import(global) for speed, from src import settigns later
+from src.entities import Fighter
 
 def main():
 
     pygame.init()
-
     # Creating the window
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Nogame")
-
     clock = pygame.time.Clock()
 
-    # Temporary "Rect" representing our player
-    player_rect = pygame.Rect(100, FLOOR_Y - 100, 50, 100)
+    arthur_stats = {"hp": 100, "speed": 7}
+    p1 = Fighter(1,200, FLOOR_Y, "arthurPendragon_", arthur_stats)
 
     # -- THE GAME LOOP --
     running = True
     while running:
-        # Check for events 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
+        # --- THE HEARTBEAT ---
+        # This runs move() and apply_physics() 60 times a second
+        p1.update()
+
+        # --- THE CANVAS ---
+        screen.fill(BLACK) # Clear the old frame
         
-        # Draw everything
-        screen.fill(BLACK) # Clear screen first
+        # Draw the character at their new position
+        p1.draw(screen)
 
-        # Temp player
-        pygame.draw.rect(screen, RED, player_rect)
-
-        # Update the display
         pygame.display.flip()
-
-        # Keep the game running at exactly 60 FPS
         clock.tick(FPS)
 
-    pygame.quit() # shut downs the game engine
-    sys.exit() # tells this python program is finished, close it and give memory back 
+    pygame.quit()
+    sys.exit()
 
-
-# Safety switch
 if __name__ == "__main__":
-    main()    
+    main()

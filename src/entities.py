@@ -2,7 +2,7 @@ import pygame
 from src.settings import GRAVITY, FLOOR_Y
 from src.utils import load_spritesheet
 
-class Figter(pygame.sprite.Sprite): # inherit powers of pygame.sprite.Sprite
+class Fighter(pygame.sprite.Sprite): # inherit powers of pygame.sprite.Sprite
     # 'self' keyword for pinning variables to that specific object
     def __init__(self, player_num, x, y, name, stats): # For things happens ONCE
         # Initialize the parent Sprite class
@@ -42,7 +42,7 @@ class Figter(pygame.sprite.Sprite): # inherit powers of pygame.sprite.Sprite
         # dx stands for 'delta x'
         dx = 0
 
-        keys = pygame.keys.get_pressed() # getting a list of keys currently pressed 
+        keys = pygame.key.get_pressed() # getting a list of keys currently pressed 
 
         if self.player_num == 1:
             # Player 1 uses WASD
