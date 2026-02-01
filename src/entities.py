@@ -32,6 +32,13 @@ class Fighter(pygame.sprite.Sprite): # inherit powers of pygame.sprite.Sprite
         self.action = 0 # 0: Idle, 1: Run, 2: Jump (based on README rows)
         self.update_time = pygame.time.get_ticks() 
 
+        # Combat Variables
+        self.attacking = False
+        self.attack_type = 0 # for further modification
+        self.attack_cooldown = 0 # To prevent spam attacks
+        self.hitbox = pygame.Rect(0, 0, 0, 0) # Initialize an empty box
+        self.hit_registered = False # Track if this specific swing has landed
+
     # METHODS
     def apply_physics(self): # reaching 'backpack' with the self argument
         self.vel_y += GRAVITY
@@ -47,40 +54,48 @@ class Fighter(pygame.sprite.Sprite): # inherit powers of pygame.sprite.Sprite
         dx = 0
         keys = pygame.key.get_pressed() # getting a list of keys currently pressed 
 
-        new_action = 0 # Start by IDLE
+        new_action = self.action
+
+        if not self.attacking:
+            new_action = 0
 
         if self.player_num == 1:
             # Player 1 uses WASD
             if keys[pygame.K_a]: # Move left
                 dx = -self.speed
                 self.flip = True
-                self.action = 1
+                new_action = 1
             elif keys[pygame.K_d]: # Move right
                 dx = self.speed
                 self.flip = False
-                self.action = 1 
+                new_action = 1 
             if keys[pygame.K_w] and self.on_ground:
                 self.vel_y = -18 # initial upward burst, to go up you must subtract from Y
                 self.on_ground = False
+            if keys[pygame.K_SPACE] and not self.attacking:
+                self.attack()
+                return
 
         elif self.player_num == 2:
             if keys[pygame.K_LEFT]:
                 dx = -self.speed
                 self.flip = True
-                self.action = 1              
+                new_action = 1              
             elif keys[pygame.K_RIGHT]:
                 dx = self.speed
                 self.flip = False
-                self.action = 1
+                new_action = 1
             if keys[pygame.K_UP] and self.on_ground:
                 self.vel_y = -18
                 self.on_ground = False            
+            if keys[pygame.K_RETURN] and not self.attacking:
+                self.attack()
+                return
 
         if not self.on_ground:
             new_action = 2 # aka jumping
 
         self.update_action(new_action)
-
         # Final physical movement
         self.rect.x += dx    
 
@@ -93,6 +108,10 @@ class Fighter(pygame.sprite.Sprite): # inherit powers of pygame.sprite.Sprite
     def draw(self, screen):
         # Put it on the screen
         screen.blit(self.image, self.rect)
+
+        # Drawing the hitbox as a red outline to test
+        if self.attacking:
+            pygame.draw.rect(screen, (255, 0, 0), self.hitbox, 2)
 
     def update_action(self, new_action):
         # Only reset the animation if the action actually changed
@@ -109,17 +128,51 @@ class Fighter(pygame.sprite.Sprite): # inherit powers of pygame.sprite.Sprite
         current_row_start = self.action * 8
         side_offset = 4 if self.flip else 0    
 
-        # Calculate the exact frame index in the big list, we use % 4 to make sure it loops.
-        actual_index = current_row_start + side_offset + (int(self.frame_index) % 4)
-        self.image = self.all_frames[actual_index]
+        # Real frame count
+        actual_index = current_row_start + side_offset + int(self.frame_index)
 
-        # Check if enough time has passed to change frames
+        # Out of bounds check
+        if actual_index < len(self.all_frames):
+            self.image = self.all_frames[actual_index]
+
+        # Handle timer
         if pygame.time.get_ticks() - self.update_time > animation_cooldown:
             self.update_time = pygame.time.get_ticks()
             self.frame_index += 1
 
-    def update(self):
+        # End of animation reset
+        if self.frame_index >= 4:
+            self.frame_index = 0
+            if self.attacking:
+                self.attacking = False
+                self.action = 0 # After attack, we go back to IDLE pose                
+
+    def attack(self):
+        self.attacking = True
+        self.hit_registered = False # Reset for the new swing
+        self.update_action(3) # Row 3 is attack based on README
+
+    def update(self, target):
         # Every single frame (1/60th of a second), do these:
         self.move() 
         self.apply_physics()  
         self.animate()
+
+        # Hitbox calculation
+        if self.attacking:
+            h_width = 70
+            h_height = 50
+            # Center the hitbox vertically on the character
+            y_pos = self.rect.centery - (h_height // 2)
+
+            if self.flip:
+                self.hitbox = pygame.Rect(self.rect.left - h_width, y_pos, h_width, h_height)
+            else:
+                self.hitbox = pygame.Rect(self.rect.right, y_pos, h_width, h_height)
+
+        # The hit detection
+        if not self.hit_registered:
+            if self.hitbox.colliderect(target.rect):
+                print(f"{target.name} was hit!")
+                target.hp -= 10
+                self.hit_registered = True                 

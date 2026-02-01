@@ -35,8 +35,8 @@ def main():
 
         # --- THE HEARTBEAT ---
         # This runs move() and apply_physics() 60 times a second
-        p1.update()
-        p2.update()
+        p1.update(p2)
+        p2.update(p1)
         # drawing the background at (0,0) - the top left corner
         screen.blit(bg_image, (0,0))
         
