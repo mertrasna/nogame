@@ -26,6 +26,7 @@ class Fighter(pygame.sprite.Sprite): # inherit powers of pygame.sprite.Sprite
         self.vel_y = 0 # Vertical velocity 
         self.speed = stats["speed"]
         self.hp = stats["hp"]
+        self.max_hp = stats["hp"] # Store the original total
         self.on_ground = False
 
         # Animation Variables

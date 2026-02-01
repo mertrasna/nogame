@@ -3,6 +3,7 @@ import pygame
 import sys 
 from src.settings import * # module import(global) for speed, from src import settigns later
 from src.entities import Fighter
+from src.ui import draw_health_bar
 import random
 
 def main():
@@ -39,6 +40,10 @@ def main():
         p2.update(p1)
         # drawing the background at (0,0) - the top left corner
         screen.blit(bg_image, (0,0))
+
+        # Health bars
+        draw_health_bar(screen, p1.hp,p1.max_hp, 50, 40)
+        draw_health_bar(screen, p2.hp,p2.max_hp, 880, 40, flip=True)
         
         # Draw the character at their new position
         p1.draw(screen)
