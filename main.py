@@ -4,27 +4,22 @@ import sys
 from src.settings import * # module import(global) for speed, from src import settigns later
 from src.entities import Fighter
 from src.ui import draw_health_bar
+from src.game import Game
 import random
 
 def main():
 
     pygame.init()
-    # Creating the window
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
-    pygame.display.set_caption("Nogame")
     clock = pygame.time.Clock()
+    bg_image = pygame.image.load("assets/backgrounds/game_background_3.png").convert_alpha()
+    bg_image = pygame.transform.scale(bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-    arthur_stats = {"hp": 100, "speed": 9}
-    gawain_stats = {"hp": 150, "speed": 7}
-    p1 = Fighter(1, 200, FLOOR_Y, "arthurPendragon_", arthur_stats)
-    p2 = Fighter(2, 1000, FLOOR_Y, "gawain_", gawain_stats)
+    # Game Manager (game.py)
+    game_manager = Game(screen)
 
     # -- THE GAME LOOP --
     running = True
-    # Background configs
-    bg_image_path = "assets/backgrounds/game_background_"
-    bg_images = (pygame.image.load(f"{bg_image_path}1.png").convert(), pygame.image.load(f"{bg_image_path}2.png").convert(), pygame.image.load(f"{bg_image_path}3.png").convert(), pygame.image.load(f"{bg_image_path}4.png").convert()) 
-    bg_image = pygame.transform.scale(bg_images[random.randint(0,3)],(SCREEN_WIDTH, SCREEN_HEIGHT))
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -32,25 +27,14 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
+                if event.key == pygame.K_r and game_manager.game_over:
+                    game_manager.reset()    
 
-
-        # --- THE HEARTBEAT ---
-        # This runs move() and apply_physics() 60 times a second
-        p1.update(p2)
-        p2.update(p1)
-        # drawing the background at (0,0) - the top left corner
-        screen.blit(bg_image, (0,0))
-
-        # Health bars
-        draw_health_bar(screen, p1.hp,p1.max_hp, 50, 40)
-        draw_health_bar(screen, p2.hp,p2.max_hp, 880, 40, flip=True)
-        
-        # Draw the character at their new position
-        p1.draw(screen)
-        p2.draw(screen)
+        game_manager.update()
+        game_manager.draw(bg_image)
 
         pygame.display.flip()
-        clock.tick(FPS)
+        clock.tick(60)
 
     pygame.quit()
     sys.exit()
